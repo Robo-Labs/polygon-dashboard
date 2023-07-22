@@ -18,10 +18,10 @@
 	}
 </script>
 
-<div class="collapse collapse-arrow w-full outline outline-1 outline-secondary">
+<div class="collapse collapse-arrow w-full outline outline-1 outline-secondary shadow-lg">
 	<input type="checkbox" />
 	<div class="collapse-title font-bold">Options</div>
-	<div class="join join-vertical w-full rounded-xl collapse-content">
+	<div class="join join-vertical w-full collapse-content">
 		<TableSearch />
 		<TableSelect title="Protocol" options={protocolOptions} />
 		<TableSelect title="Token" options={tokenOptions} />

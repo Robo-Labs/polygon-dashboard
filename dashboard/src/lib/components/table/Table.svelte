@@ -51,7 +51,9 @@
 	const table = createSvelteTable(options);
 </script>
 
-<div class="overflow-x-auto w-full outline outline-1 outline-secondary rounded-xl">
+<div
+	class="overflow-x-auto w-full outline outline-1 outline-secondary bg-secondary text-secondary-content rounded-box shadow-lg"
+>
 	<table class="table table-lg">
 		<thead>
 			{#each $table.getHeaderGroups() as headerGroup}
@@ -96,3 +98,9 @@
 		</tfoot>
 	</table>
 </div>
+
+<style>
+	.table :where(thead, tfoot) {
+		color: hsl(var(--sc) / 0.6);
+	}
+</style>
