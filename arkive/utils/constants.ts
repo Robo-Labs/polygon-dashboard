@@ -1,0 +1,3 @@
+export const O_ETH = "0xee1727f5074E747716637e1776B7F7C7133f16b1";
+
+export const EXP_SCALE_DECIMALS = 18;

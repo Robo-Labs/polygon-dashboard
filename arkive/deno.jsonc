@@ -1,0 +1,5 @@
+{
+	"tasks": {
+		"db": "docker run -dp 27017:27017 --rm --name mongo mongo"
+	}
+}

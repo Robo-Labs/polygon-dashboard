@@ -1,10 +1,21 @@
 import { COMPTROLLER } from "./abis/Comptroller.ts";
 import { OERC20 } from "./abis/OErc20.ts";
 import { Manifest } from "./deps.ts";
+import { Account } from "./entities/account.ts";
+import { Market } from "./entities/market.ts";
+import { onAccrueInterest } from "./handlers/accrue-interest.ts";
+import { onBorrow } from "./handlers/borrow.ts";
+// import { updateMarkets } from "./handlers/market-update.ts";
 import { onMint } from "./handlers/mint.ts";
-const manifest = new Manifest("polygon");
+import { onRedeem } from "./handlers/redeem.ts";
+import { onRepayBorrow } from "./handlers/repay-borrow.ts";
+import { onTransfer } from "./handlers/transfer.ts";
 
-manifest
+export default new Manifest("polygon-zkevm")
+  .addEntities([
+    Account,
+    Market,
+  ])
   .addChain("polygonZkEvm", (chain) =>
     chain
       .setOptions({
@@ -22,11 +33,21 @@ manifest
         abi: OERC20,
         eventHandlers: {
           Mint: onMint,
+          Redeem: onRedeem,
+          Transfer: onTransfer,
+          AccrueInterest: onAccrueInterest,
+          Borrow: onBorrow,
+          RepayBorrow: onRepayBorrow,
         },
         factorySources: {
           Comptroller: {
             MarketListed: "oToken",
           },
         },
-      }));
-export default manifest.build();
+      }) // .addBlockHandler({
+    //   blockInterval: 100,
+    //   startBlockHeight: "live",
+    //   handler: updateMarkets,
+    // }))
+  )
+  .build();
