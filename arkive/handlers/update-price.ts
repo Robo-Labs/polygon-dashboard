@@ -3,7 +3,13 @@ import {
   PRICE_ORACLE_ABI,
   PRICE_ORACLE_ADDRESS,
 } from "../config/priceOracle.ts";
-import { bigIntToFloat, BlockHandler, getContract, parseAbi } from "../deps.ts";
+import {
+  bigIntToFloat,
+  BlockHandler,
+  ContractFunctionExecutionError,
+  getContract,
+  parseAbi,
+} from "../deps.ts";
 import { getMarkets, saveMarket } from "../utils/market.ts";
 import { getUnderlyingDecimals } from "../utils/token.ts";
 
@@ -18,9 +24,17 @@ export const priceUpdater: BlockHandler = async (ctx) => {
 
   await Promise.all(markets.map(async (market) => {
     const [price, underlyingDecimals] = await Promise.all([
-      priceOracle.read.getUnderlyingPrice([
-        market.address as `0x${string}`,
-      ], { blockNumber: ctx.block.number }),
+      (async () => {
+        try {
+          return await priceOracle.read.getUnderlyingPrice([
+            market.address as `0x${string}`,
+          ], { blockNumber: ctx.block.number });
+        } catch (e) {
+          if (e instanceof ContractFunctionExecutionError) {
+            return;
+          }
+        }
+      })(),
       getUnderlyingDecimals({
         contract: getContract({
           abi: OERC20,
@@ -31,6 +45,7 @@ export const priceUpdater: BlockHandler = async (ctx) => {
         store: ctx.store,
       }),
     ]);
+    if (price === undefined) return;
     market.priceUsd = bigIntToFloat(price, 36 - underlyingDecimals);
     saveMarket({
       address: market.address as `0x${string}`,

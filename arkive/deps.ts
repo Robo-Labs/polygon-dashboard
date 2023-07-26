@@ -1,4 +1,5 @@
 export {
+  ContractFunctionExecutionError,
   formatUnits,
   getContract,
   type GetContractReturnType,

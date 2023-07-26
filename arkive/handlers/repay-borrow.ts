@@ -4,7 +4,7 @@ import { updateAccountBorrow } from "../utils/account.ts";
 
 export const onRepayBorrow: EventHandlerFor<typeof OERC20, "RepayBorrow"> =
   async (ctx) => {
-    const { accountBorrows, borrower } = ctx.event.args;
+    const { accountBorrows, borrower, totalBorrows } = ctx.event.args;
 
     await Promise.all([
       updateAccountBorrow({
@@ -17,7 +17,7 @@ export const onRepayBorrow: EventHandlerFor<typeof OERC20, "RepayBorrow"> =
       }),
       updateAccountBorrow({
         account: "total",
-        accountBorrows,
+        accountBorrows: totalBorrows,
         market: ctx.event.address,
         client: ctx.client,
         store: ctx.store,
