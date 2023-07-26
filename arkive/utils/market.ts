@@ -115,6 +115,8 @@ export const updateMarketExchangeRate = async (params: {
   const { address, client, oTokens, store, underlyingTokens, contract } =
     params;
 
+  if (oTokens === 0n) return;
+
   const [oDecimals, underlyingDecimals] = await Promise.all([
     getODecimals({
       contract,
