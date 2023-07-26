@@ -7,11 +7,22 @@ export const onBorrow: EventHandlerFor<typeof OERC20, "Borrow"> = async (
 ) => {
   const { borrower, accountBorrows } = ctx.event.args;
 
-  await updateAccountBorrow({
-    account: borrower,
-    accountBorrows,
-    market: ctx.event.address,
-    client: ctx.client,
-    store: ctx.store,
-  });
+  await Promise.all([
+    updateAccountBorrow({
+      account: borrower,
+      accountBorrows,
+      market: ctx.event.address,
+      client: ctx.client,
+      store: ctx.store,
+      contract: ctx.contract,
+    }),
+    updateAccountBorrow({
+      account: "total",
+      accountBorrows,
+      market: ctx.event.address,
+      client: ctx.client,
+      store: ctx.store,
+      contract: ctx.contract,
+    }),
+  ]);
 };

@@ -2,6 +2,7 @@ export {
   formatUnits,
   getContract,
   type GetContractReturnType,
+  parseAbi,
   type PublicClient,
   zeroAddress,
 } from "npm:viem";

@@ -4,4 +4,6 @@ export const STORE_KEYS = {
   SYMBOL: "symbol",
   ACCOUNT: "account",
   BORROW_INDEX: "borrowIndex",
+  DECIMALS: "decimals",
+  UNDERLYING: "underlying",
 } as const;

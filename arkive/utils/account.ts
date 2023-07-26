@@ -1,8 +1,14 @@
-import { mongoose, PublicClient, Store, zeroAddress } from "../deps.ts";
+import { OERC20 } from "../abis/OErc20.ts";
+import {
+  GetContractReturnType,
+  mongoose,
+  PublicClient,
+  Store,
+} from "../deps.ts";
 import { Account } from "../entities/account.ts";
 import { STORE_KEYS } from "./keys.ts";
 import { getMarket, getMarketBorrowIndex } from "./market.ts";
-import { formatErc20Token } from "./token.ts";
+import { formatErc20Token, getUnderlyingFloat } from "./token.ts";
 
 export const updateAccountOTokenCollateral = async (params: {
   account: string;
@@ -12,9 +18,6 @@ export const updateAccountOTokenCollateral = async (params: {
   client: PublicClient;
 }) => {
   const { account, amount, oTokenAddress, store, client } = params;
-
-  if (account === zeroAddress) return;
-  if (account === oTokenAddress) return;
 
   const accountEnt = await getAccount({
     account,
@@ -32,7 +35,7 @@ export const updateAccountOTokenCollateral = async (params: {
 
   accountEnt.oTokenCollateralBalance += formattedAmount;
 
-  saveAccount({ account: accountEnt, store });
+  saveAccount({ account: accountEnt, store, marketAddress: oTokenAddress });
 };
 
 export const updateAccountBorrow = async (params: {
@@ -41,8 +44,9 @@ export const updateAccountBorrow = async (params: {
   market: `0x${string}`;
   store: Store;
   client: PublicClient;
+  contract: GetContractReturnType<typeof OERC20, PublicClient>;
 }) => {
-  const { account, accountBorrows, client, market, store } = params;
+  const { account, accountBorrows, client, market, store, contract } = params;
 
   const marketBorrowIndex = await getMarketBorrowIndex({
     address: market,
@@ -57,17 +61,17 @@ export const updateAccountBorrow = async (params: {
     store,
   });
 
-  const formattedAmount = await formatErc20Token({
-    address: market,
+  const formattedAmount = await getUnderlyingFloat({
     amount: accountBorrows,
     client,
     store,
+    contract,
   });
 
   accountEnt.borrowBalance = formattedAmount;
   accountEnt.borrowIndex = marketBorrowIndex;
 
-  saveAccount({ account: accountEnt, store });
+  saveAccount({ account: accountEnt, store, marketAddress: market });
 };
 
 export const saveAccount = (params: {
@@ -76,11 +80,12 @@ export const saveAccount = (params: {
     _id: mongoose.Types.ObjectId;
   };
   store: Store;
+  marketAddress: string;
 }) => {
-  const { account, store } = params;
+  const { account, store, marketAddress } = params;
 
   store.set(
-    `${STORE_KEYS.ACCOUNT}:${account.address.toLowerCase()}:${account.market.address.toLowerCase()}`,
+    `${STORE_KEYS.ACCOUNT}:${account.address.toLowerCase()}:${marketAddress.toLowerCase()}`,
     account.save(),
   );
 };
@@ -110,7 +115,7 @@ export const getAccount = async (params: {
       return new Account({
         address: account,
         borrowBalance: 0,
-        borrowIndex: 1,
+        borrowIndex: 0,
         market,
         oTokenCollateralBalance: 0,
       });

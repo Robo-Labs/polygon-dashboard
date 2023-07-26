@@ -7,6 +7,7 @@ export type Market = {
   borrowIndex: number;
   exchangeRate: number;
   priceUsd: number;
+  collateralFactor: number;
 };
 
 export const Market = createEntity<Market>("Market", {
@@ -16,4 +17,5 @@ export const Market = createEntity<Market>("Market", {
   borrowIndex: "number",
   exchangeRate: "number",
   priceUsd: "number",
+  collateralFactor: "number",
 });
