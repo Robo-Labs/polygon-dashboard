@@ -12,12 +12,29 @@ import { onRedeem } from "./handlers/redeem.ts";
 import { onRepayBorrow } from "./handlers/repay-borrow.ts";
 import { onTransfer } from "./handlers/transfer.ts";
 import { priceUpdater } from "./handlers/update-price.ts";
+import { resolveCollateralAtRisk } from "./queries/collateral.ts";
 
 export default new Manifest("polygon-zkevm")
   .addEntities([
     Market,
     Account,
   ])
+  .extendSchema((schemaComposer) => {
+    schemaComposer.Query.addFields({
+      CollateralAtRisk: {
+        type: "Float!",
+        resolve: resolveCollateralAtRisk,
+        args: {
+          filterByAccountAddress: {
+            type: "String",
+          },
+          filterByMarketAddress: {
+            type: "String",
+          },
+        },
+      },
+    });
+  })
   .addChain("polygonZkEvm", (chain) =>
     chain
       .addContract({

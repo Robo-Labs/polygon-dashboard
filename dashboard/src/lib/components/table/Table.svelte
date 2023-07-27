@@ -2,12 +2,12 @@
 	import { writable } from 'svelte/store';
 	import { createSvelteTable, flexRender, getCoreRowModel } from '@tanstack/svelte-table';
 	import { createColumnHelper, type TableOptions } from '@tanstack/table-core';
-	import { type Stat, fetchStats } from '$lib/queries/stats';
+	import { type Stat, fetchStats, STATS_QUERY_KEY } from '$lib/queries/stats';
 	import { createQuery } from '@tanstack/svelte-query';
 
 	const query = createQuery({
-		queryKey: ['stats'],
-		queryFn: () => fetchStats({ fetch })
+		queryKey: [STATS_QUERY_KEY],
+		queryFn: fetchStats
 	});
 
 	const columnHelper = createColumnHelper<Stat>();
@@ -25,13 +25,17 @@
 			header: 'Supply',
 			footer: 'Supply',
 			cell: (props) =>
-				props.getValue().toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+				props
+					.getValue()
+					.toLocaleString('en', { style: 'currency', currency: 'USD', notation: 'compact' })
 		}),
 		columnHelper.accessor('debt', {
 			header: 'Debt',
 			footer: 'Debt',
 			cell: (props) =>
-				props.getValue().toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+				props
+					.getValue()
+					.toLocaleString('en', { style: 'currency', currency: 'USD', notation: 'compact' })
 		})
 	];
 

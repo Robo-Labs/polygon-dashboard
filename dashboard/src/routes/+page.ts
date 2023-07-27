@@ -1,11 +1,11 @@
-import { fetchStats } from "$lib/queries/stats";
+import { fetchStats, STATS_QUERY_KEY } from "$lib/queries/stats";
 import type { PageLoad } from "./$types";
 
-export const load: PageLoad = async ({ parent, fetch }) => {
+export const load: PageLoad = async ({ parent }) => {
   const { queryClient } = await parent();
 
   await queryClient.prefetchQuery({
-    queryKey: ["stats"],
-    queryFn: () => fetchStats({ fetch }),
+    queryKey: [STATS_QUERY_KEY],
+    queryFn: fetchStats,
   });
 };

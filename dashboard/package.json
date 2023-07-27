@@ -36,6 +36,8 @@
 	"dependencies": {
 		"@tanstack/svelte-query": "^4.32.0",
 		"@tanstack/svelte-table": "^8.9.4",
-		"@tanstack/table-core": "^8.9.3"
+		"@tanstack/table-core": "^8.9.3",
+		"graphql": "^16.7.1",
+		"graphql-request": "^6.1.0"
 	}
 }

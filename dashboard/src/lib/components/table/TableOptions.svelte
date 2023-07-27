@@ -1,20 +1,20 @@
 <script lang="ts">
 	import TableSearch from './TableSearch.svelte';
 	import TableSelect from './TableSelect.svelte';
-	import { fetchStats } from '$lib/queries/stats';
+	import { STATS_QUERY_KEY, fetchStats } from '$lib/queries/stats';
 	import { createQuery } from '@tanstack/svelte-query';
 
 	const query = createQuery({
-		queryKey: ['stats'],
-		queryFn: () => fetchStats({ fetch })
+		queryKey: [STATS_QUERY_KEY],
+		queryFn: fetchStats
 	});
 
 	let protocolOptions: string[] = [];
 	let tokenOptions: string[] = [];
 
 	$: if ($query.isSuccess) {
-		protocolOptions = $query.data.map((stat) => stat.protocol);
-		tokenOptions = $query.data.map((stat) => stat.pool);
+		protocolOptions = [...new Set($query.data.map((stat) => stat.protocol))];
+		tokenOptions = [...new Set($query.data.map((stat) => stat.pool))];
 	}
 </script>
 
