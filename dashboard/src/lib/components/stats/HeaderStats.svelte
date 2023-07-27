@@ -15,24 +15,28 @@
 		notation: 'compact'
 	});
 
-	$: totalSupply = $query.data?.reduce((acc, stat) => acc + stat.supply, 0) ?? 0;
-	$: totalBorrowed = $query.data?.reduce((acc, stat) => acc + stat.debt, 0) ?? 0;
+	$: totalSupply = $query.data?.stats.reduce((acc, stat) => acc + stat.supply, 0) ?? 0;
+	$: totalBorrowed = $query.data?.stats.reduce((acc, stat) => acc + stat.debt, 0) ?? 0;
 	$: totalBorrowingPower =
-		$query.data?.reduce((acc, stat) => acc + stat.supply * stat.collateralFactor, 0) ?? 0;
+		$query.data?.stats.reduce((acc, stat) => acc + stat.supply * stat.collateralFactor, 0) ?? 0;
 </script>
 
 <StatsGroup>
 	<Stat
 		title="Total Supplied"
 		value={numberFormatter.format(totalSupply)}
-		loading={totalSupply === 0 || $query.isLoading}
+		loading={$query.data === undefined || $query.isLoading}
 	/>
 	<Stat
 		title="Borrowed / Borrowing Power"
 		value={`${numberFormatter.format(totalBorrowed)} / ${numberFormatter.format(
 			totalBorrowingPower
 		)}`}
-		loading={totalBorrowed === 0 || totalBorrowingPower === 0 || $query.isLoading}
+		loading={$query.data === undefined || $query.isLoading}
 	/>
-	<Stat title="Liquidations at Risk" value="$42k" loading={$query.isLoading} />
+	<Stat
+		title="Liquidations at Risk"
+		value={numberFormatter.format($query.data?.collateralAtRisk ?? 0)}
+		loading={$query.data === undefined || $query.isLoading}
+	/>
 </StatsGroup>

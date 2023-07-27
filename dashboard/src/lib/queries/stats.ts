@@ -14,12 +14,14 @@ export type RawStats = {
     exchangeRate: number;
     priceUsd: number;
     collateralFactor: number;
+    underlyingSymbol: string;
   };
 };
 
 export type Stat = {
   protocol: string;
   pool: string;
+  token: string;
   supply: number;
   debt: number;
   liquidity: number;
@@ -38,30 +40,38 @@ const query = gql`
       exchangeRate
       collateralFactor
       borrowIndex
+			underlyingSymbol
     }
   }
+	CollateralAtRisk
 }
 `;
 
-export const fetchStats = async (): Promise<Stat[]> => {
-  const res = await request<{ Accounts: RawStats[] }>(
+export const fetchStats = async (): Promise<
+  { stats: Stat[]; collateralAtRisk: number }
+> => {
+  const res = await request<{ Accounts: RawStats[]; CollateralAtRisk: number }>(
     GRAPHQL_ENDPOINT,
     query,
   );
 
-  return res.Accounts.map((rawStat) => {
-    const debt = rawStat.borrowBalance / rawStat.borrowIndex *
-      rawStat.market.borrowIndex * rawStat.market.priceUsd;
-    const supply = rawStat.oTokenCollateralBalance *
-      rawStat.market.exchangeRate * rawStat.market.priceUsd;
-    const liquidity = supply * rawStat.market.collateralFactor - debt;
-    return {
-      protocol: "0Vix",
-      pool: rawStat.market.name,
-      collateralFactor: rawStat.market.collateralFactor,
-      supply,
-      debt,
-      liquidity,
-    };
-  });
+  return {
+    stats: res.Accounts.map((rawStat) => {
+      const debt = rawStat.borrowBalance / rawStat.borrowIndex *
+        rawStat.market.borrowIndex * rawStat.market.priceUsd;
+      const supply = rawStat.oTokenCollateralBalance *
+        rawStat.market.exchangeRate * rawStat.market.priceUsd;
+      const liquidity = supply * rawStat.market.collateralFactor - debt;
+      return {
+        protocol: "0Vix",
+        pool: rawStat.market.name,
+        token: rawStat.market.underlyingSymbol,
+        collateralFactor: rawStat.market.collateralFactor,
+        supply,
+        debt,
+        liquidity,
+      };
+    }),
+    collateralAtRisk: res.CollateralAtRisk,
+  };
 };

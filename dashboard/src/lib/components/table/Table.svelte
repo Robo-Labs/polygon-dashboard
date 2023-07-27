@@ -40,7 +40,7 @@
 	];
 
 	const options = writable<TableOptions<Stat>>({
-		data: $query.data ?? [],
+		data: $query.data?.stats ?? [],
 		columns: defaultColumns,
 		getCoreRowModel: getCoreRowModel()
 	});
@@ -48,7 +48,7 @@
 	$: if ($query.isSuccess) {
 		options.update((options) => ({
 			...options,
-			data: $query.data ?? []
+			data: $query.data?.stats ?? []
 		}));
 	}
 

@@ -9,7 +9,7 @@ import {
   Store,
 } from "../deps.ts";
 import { Market } from "../entities/market.ts";
-import { EXP_SCALE_DECIMALS } from "./constants.ts";
+import { EXP_SCALE_DECIMALS, O_ETH } from "./constants.ts";
 import { STORE_KEYS } from "./keys.ts";
 import { getODecimals, getUnderlyingDecimals } from "./token.ts";
 
@@ -38,6 +38,28 @@ export const getMarket = async (
         `${STORE_KEYS.SYMBOL}:${address}`,
         contract.read.symbol,
       );
+      let underlyingAddress;
+      let underlyingSymbol;
+
+      if (address === O_ETH) {
+        underlyingAddress = "native";
+        underlyingSymbol = "ETH";
+      } else {
+        underlyingAddress = await store.retrieve(
+          `${STORE_KEYS.UNDERLYING}:${address}`,
+          contract.read.underlying,
+        );
+        const underlyingContract = getContract({
+          abi: OERC20,
+          address: underlyingAddress,
+          publicClient: client,
+        });
+        underlyingSymbol = await store.retrieve(
+          `${STORE_KEYS.SYMBOL}:${underlyingAddress.toLowerCase()}`,
+          underlyingContract.read.symbol,
+        );
+      }
+
       const newMarket = new Market({
         address,
         borrowIndex: 1,
@@ -46,6 +68,8 @@ export const getMarket = async (
         symbol,
         priceUsd: 1,
         collateralFactor: 0,
+        underlyingAddress,
+        underlyingSymbol,
       });
       return newMarket.save();
     },
