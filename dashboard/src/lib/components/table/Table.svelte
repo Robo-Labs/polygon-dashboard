@@ -4,15 +4,20 @@
 	import { createColumnHelper, type TableOptions } from '@tanstack/table-core';
 	import { type Stat, fetchStats, STATS_QUERY_KEY } from '$lib/queries/stats';
 	import { createQuery } from '@tanstack/svelte-query';
+	import { accountFilter } from '$lib/stores/filters';
 
 	const query = createQuery({
-		queryKey: [STATS_QUERY_KEY],
-		queryFn: fetchStats
+		queryKey: [`${STATS_QUERY_KEY}:${$accountFilter}`],
+		queryFn: () => fetchStats({ account: $accountFilter })
 	});
 
 	const columnHelper = createColumnHelper<Stat>();
 
 	const defaultColumns = [
+		columnHelper.accessor('account', {
+			header: 'Account',
+			footer: 'Account'
+		}),
 		columnHelper.accessor('protocol', {
 			header: 'Protocol',
 			footer: 'Protocol'

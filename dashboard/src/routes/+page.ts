@@ -5,7 +5,7 @@ export const load: PageLoad = async ({ parent }) => {
   const { queryClient } = await parent();
 
   await queryClient.prefetchQuery({
-    queryKey: [STATS_QUERY_KEY],
-    queryFn: fetchStats,
+    queryKey: [`${STATS_QUERY_KEY}:total`],
+    queryFn: () => fetchStats({ account: "total" }),
   });
 };

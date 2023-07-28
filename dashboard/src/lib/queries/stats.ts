@@ -1,10 +1,12 @@
 import { gql, request } from "graphql-request";
 
-export const GRAPHQL_ENDPOINT = "http://localhost:4000/graphql" as const;
+export const GRAPHQL_ENDPOINT =
+  "https://data.staging.arkiver.net/robolabs/polygon-zkevm/graphql" as const;
 
 export const STATS_QUERY_KEY = "stats" as const;
 
 export type RawStats = {
+  address: string;
   borrowBalance: number;
   oTokenCollateralBalance: number;
   borrowIndex: number;
@@ -26,11 +28,14 @@ export type Stat = {
   debt: number;
   liquidity: number;
   collateralFactor: number;
+  account: string;
 };
 
-const query = gql`
+const createQuery = (filters: { account: string }) =>
+  gql`
 {
-  Accounts(filter: {address: "total"}) {
+  Accounts(filter: {address: "${filters.account}"}) {
+		address
     borrowBalance
     oTokenCollateralBalance
     borrowIndex
@@ -44,21 +49,33 @@ const query = gql`
     }
   }
 	CollateralAtRisk
+  ArkiverMetadata(sort: PROCESSEDBLOCKHEIGHT_DESC) {
+    processedBlockHeight
+  }
 }
 `;
 
-export const fetchStats = async (): Promise<
-  { stats: Stat[]; collateralAtRisk: number }
+export const fetchStats = async (filters: { account: string }): Promise<
+  { stats: Stat[]; collateralAtRisk: number; processedBlockHeight: number }
 > => {
-  const res = await request<{ Accounts: RawStats[]; CollateralAtRisk: number }>(
+  const res = await request<
+    {
+      Accounts: RawStats[];
+      CollateralAtRisk: number;
+      ArkiverMetadata: { processedBlockHeight: number };
+    }
+  >(
     GRAPHQL_ENDPOINT,
-    query,
+    createQuery(filters),
   );
+  console.log(res);
 
   return {
     stats: res.Accounts.map((rawStat) => {
-      const debt = rawStat.borrowBalance / rawStat.borrowIndex *
-        rawStat.market.borrowIndex * rawStat.market.priceUsd;
+      const debt = rawStat.borrowIndex === 0
+        ? 0
+        : rawStat.borrowBalance / rawStat.borrowIndex *
+          rawStat.market.borrowIndex * rawStat.market.priceUsd;
       const supply = rawStat.oTokenCollateralBalance *
         rawStat.market.exchangeRate * rawStat.market.priceUsd;
       const liquidity = supply * rawStat.market.collateralFactor - debt;
@@ -70,8 +87,10 @@ export const fetchStats = async (): Promise<
         supply,
         debt,
         liquidity,
+        account: rawStat.address,
       };
     }),
     collateralAtRisk: res.CollateralAtRisk,
+    processedBlockHeight: res.ArkiverMetadata.processedBlockHeight,
   };
 };

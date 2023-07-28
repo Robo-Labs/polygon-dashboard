@@ -15,5 +15,8 @@ export {
   Manifest,
   Store,
   Types,
-} from "../../robo-arkiver/mod.ts";
-export { bigIntDivToFloat, bigIntToFloat } from "../../robo-arkiver/utils.ts";
+} from "https://deno.land/x/robo_arkiver/mod.ts";
+export {
+  bigIntDivToFloat,
+  bigIntToFloat,
+} from "https://deno.land/x/robo_arkiver/utils.ts";

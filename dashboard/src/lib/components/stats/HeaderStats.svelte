@@ -3,10 +3,11 @@
 	import Stat from './Stat.svelte';
 	import StatsGroup from './StatsGroup.svelte';
 	import { STATS_QUERY_KEY, fetchStats } from '$lib/queries/stats';
+	import { accountFilter } from '$lib/stores/filters';
 
 	const query = createQuery({
-		queryKey: [STATS_QUERY_KEY],
-		queryFn: fetchStats
+		queryKey: [`${STATS_QUERY_KEY}:${$accountFilter}`],
+		queryFn: () => fetchStats({ account: $accountFilter })
 	});
 
 	const numberFormatter = new Intl.NumberFormat('en', {
