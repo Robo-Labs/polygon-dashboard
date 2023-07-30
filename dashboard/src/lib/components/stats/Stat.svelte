@@ -10,7 +10,7 @@
 	{#if loading}
 		<div class="stat-value"><span class="loading loading-dots loading-md" /></div>
 	{:else}
-		<div class="stat-value">{value}</div>
+		<div class="stat-value font-thin">{value}</div>
 	{/if}
 	{#if desc}
 		<div class="stat-desc">{desc}</div>
