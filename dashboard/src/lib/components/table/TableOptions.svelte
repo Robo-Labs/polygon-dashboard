@@ -28,7 +28,7 @@
 </script>
 
 <div
-	class="collapse collapse-arrow w-full outline outline-1 outline-secondary shadow-lg overflow-visible"
+	class="collapse collapse-arrow w-full outline outline-1 outline-secondary shadow-lg overflow-visible rounded"
 >
 	<input type="checkbox" />
 	<div class="collapse-title font-bold flex items-center gap-3">
