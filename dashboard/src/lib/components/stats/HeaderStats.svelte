@@ -29,7 +29,7 @@
 		loading={$query.data === undefined || $query.isLoading}
 	/>
 	<Stat
-		title="Borrowed / Borrowing Power"
+		title="Total Borrowed / Total Borrowing Power"
 		value={`${numberFormatter.format(totalBorrowed)} / ${numberFormatter.format(
 			totalBorrowingPower
 		)}`}
@@ -39,5 +39,6 @@
 		title="Liquidations at Risk"
 		value={numberFormatter.format($query.data?.collateralAtRisk ?? 0)}
 		loading={$query.data === undefined || $query.isLoading}
+		tooltip="The amount of collateral from borrowers with debt within 5% of their max borrow limit."
 	/>
 </StatsGroup>
