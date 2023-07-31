@@ -148,8 +148,6 @@
 		}
 	}
 
-	$: console.log($tokenFilter);
-
 	$: if ($query.isSuccess) {
 		options.update((options) => ({
 			...options,

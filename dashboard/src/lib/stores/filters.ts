@@ -28,7 +28,3 @@ export const accountFilter = createDebouncedDerivedStore(
   500,
   undefined,
 );
-
-tokenFilter.subscribe((token) => {
-  console.log(token);
-});

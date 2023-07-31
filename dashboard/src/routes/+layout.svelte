@@ -30,11 +30,11 @@
 		name="twitter:description"
 		content="Analytics for DeFi lending protocols by the Robo Labs team"
 	/>
-	<meta name="twitter:image" content="robolabs_og.png" />
+	<meta name="twitter:image" content="/robolabs_og.png" />
 	<meta property="og:title" content="DeFi Lender Dashboard | Robo Labs" />
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="https://robolabs.biz" />
-	<meta property="og:image" content="robolabs_og.png" />
+	<meta property="og:image" content="/robolabs_og.png" />
 	<meta
 		property="og:description"
 		content="Analytics for DeFi lending protocols by the Robo Labs team"
