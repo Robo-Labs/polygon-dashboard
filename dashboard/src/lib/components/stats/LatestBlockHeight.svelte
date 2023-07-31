@@ -10,11 +10,11 @@
 </script>
 
 {#if $query.data === undefined || $query.isLoading}
-	<div class="fixed bottom-4 right-4 text-info">
+	<div class="fixed bottom-4 right-4 text-info px-3 rounded bg-base-200 bg-opacity-50 z-10">
 		Last updated block: <span class="loading loading-dots loading-md" />
 	</div>
 {:else}
-	<div class="fixed bottom-4 right-4 text-info">
+	<div class="fixed bottom-4 right-4 text-info px-3 rounded bg-base-200 bg-opacity-50 z-10">
 		Last updated block: {$query.data.processedBlockHeight.toLocaleString('en-US')}
 	</div>
 {/if}

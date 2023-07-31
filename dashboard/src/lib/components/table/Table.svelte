@@ -14,17 +14,13 @@
 	const columnHelper = createColumnHelper<Stat>();
 
 	const defaultColumns = [
-		columnHelper.accessor('account', {
-			header: 'Account',
-			footer: 'Account'
-		}),
 		columnHelper.accessor('protocol', {
 			header: 'Protocol',
 			footer: 'Protocol'
 		}),
-		columnHelper.accessor('pool', {
-			header: 'Pool',
-			footer: 'Pool'
+		columnHelper.accessor('token', {
+			header: 'Token',
+			footer: 'Token'
 		}),
 		columnHelper.accessor('supply', {
 			header: 'Supply',
@@ -61,7 +57,7 @@
 </script>
 
 <div
-	class="overflow-x-auto w-full outline outline-1 outline-secondary bg-secondary text-secondary-content rounded-box shadow-lg"
+	class="overflow-x-auto w-full outline outline-1 outline-secondary text-secondary-content rounded shadow-lg"
 >
 	<table class="table table-lg">
 		<thead>
@@ -90,26 +86,5 @@
 				</tr>
 			{/each}
 		</tbody>
-		<tfoot>
-			{#each $table.getFooterGroups() as footerGroup}
-				<tr>
-					{#each footerGroup.headers as header}
-						<th>
-							{#if !header.isPlaceholder}
-								<svelte:component
-									this={flexRender(header.column.columnDef.footer, header.getContext())}
-								/>
-							{/if}
-						</th>
-					{/each}
-				</tr>
-			{/each}
-		</tfoot>
 	</table>
 </div>
-
-<style>
-	.table :where(thead, tfoot) {
-		color: hsl(var(--sc) / 0.6);
-	}
-</style>

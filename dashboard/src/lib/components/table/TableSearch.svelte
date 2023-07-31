@@ -31,7 +31,10 @@
 	<input type="text" bind:value={filter} {placeholder} class="input join-item w-full" />
 	<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 	{#if !noDropdown}
-		<ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
+		<ul
+			tabindex="0"
+			class="my-0 dropdown-content z-[1] menu p-2 shadow bg-base-100 w-52 outline outline-1 outline-secondary"
+		>
 			{#each filteredOptions as option}
 				<li>
 					<button on:click={onClick}>{option}</button>

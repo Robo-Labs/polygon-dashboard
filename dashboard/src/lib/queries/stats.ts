@@ -68,7 +68,6 @@ export const fetchStats = async (filters: { account: string }): Promise<
     GRAPHQL_ENDPOINT,
     createQuery(filters),
   );
-  console.log(res);
 
   return {
     stats: res.Accounts.map((rawStat) => {

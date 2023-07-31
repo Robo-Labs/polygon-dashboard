@@ -22,7 +22,9 @@ export const resolveCollateralAtRisk = async (
       },
     });
   }
-  const res = await Account.aggregate([
+  const connection = mongoose.connection.useDb("138-1");
+  const model = connection.model(Account.modelName, Account.schema);
+  const res = await model.aggregate([
     ...addressFilterStage,
     {
       $lookup: {

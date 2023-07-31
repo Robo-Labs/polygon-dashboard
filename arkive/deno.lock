@@ -124,6 +124,9 @@
     "https://deno.land/x/robo_arkiver@v0.4.19/src/lib/ArkiveLib.ts": "eae2d933044983529ba7edc7a479aa779088a84e0e8f0ce8640b74492ceb0e4a",
     "https://deno.land/x/robo_arkiver@v0.4.19/src/logger.ts": "47f3fcee2904678b229017600768deae4c476533631853809d9aaa2de0135bef",
     "https://deno.land/x/robo_arkiver@v0.4.19/src/utils.ts": "878e1c6579e18ff725b203a510b0627c2e00b97e3f27c7335eb7a9ae46f6c8c5",
+    "https://deno.land/x/robo_arkiver@v0.4.19/src/utils/bigint.ts": "b43848137a62bda70e0befce6e7aa6033d91440b5c8adb4fea6cbf2ae4c0ced0",
+    "https://deno.land/x/robo_arkiver@v0.4.19/src/utils/deps.ts": "341083559a8110a97412c063be6725cffbc4e894b280c3ea2a684764f01edd57",
+    "https://deno.land/x/robo_arkiver@v0.4.19/utils.ts": "d35466ccb84140e8957b25c7c968158eddcae8af3ec6c6af2c0708da8093c7a3",
     "https://deno.land/x/web_bson@v0.3.0/mod.js": "8e14aecd31ee63abd30e2dbaa284b4b67abb7ba51fcef5b96af74727cb7c7940"
   },
   "npm": {
@@ -136,7 +139,7 @@
       "lru-cache": "lru-cache@10.0.0",
       "mongo": "mongo@0.1.0",
       "mongoose": "mongoose@7.4.1",
-      "viem": "viem@1.4.1_ws@8.12.0"
+      "viem": "viem@1.4.2_ws@8.12.0"
     },
     "packages": {
       "@adraffy/ens-normalize@1.9.0": {
@@ -368,6 +371,20 @@
       },
       "viem@1.4.1_ws@8.12.0": {
         "integrity": "sha512-MtaoBHDSJDqa+QyXKG5d+S6EQSebRO0tzw6anSP4zC7AbC614vMeg9Y8LbkmEkWCw8swFYkort+H9l7GkWB0uA==",
+        "dependencies": {
+          "@adraffy/ens-normalize": "@adraffy/ens-normalize@1.9.0",
+          "@noble/curves": "@noble/curves@1.0.0",
+          "@noble/hashes": "@noble/hashes@1.3.0",
+          "@scure/bip32": "@scure/bip32@1.3.0",
+          "@scure/bip39": "@scure/bip39@1.2.0",
+          "@wagmi/chains": "@wagmi/chains@1.6.0",
+          "abitype": "abitype@0.9.3",
+          "isomorphic-ws": "isomorphic-ws@5.0.0_ws@8.12.0",
+          "ws": "ws@8.12.0"
+        }
+      },
+      "viem@1.4.2_ws@8.12.0": {
+        "integrity": "sha512-125E7HoOr5PrL+Iwt8853dQexwRoiPpLwPsrRvlDX94su2xoe7AYqrdfR6N9nmy6vd6mt8eQy8+LWiP3A+1dqw==",
         "dependencies": {
           "@adraffy/ens-normalize": "@adraffy/ens-normalize@1.9.0",
           "@noble/curves": "@noble/curves@1.0.0",
