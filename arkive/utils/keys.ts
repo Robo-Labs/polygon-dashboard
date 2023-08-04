@@ -6,4 +6,6 @@ export const STORE_KEYS = {
   BORROW_INDEX: "borrowIndex",
   DECIMALS: "decimals",
   UNDERLYING: "underlying",
+  PYTH_TOKEN_IDS: "pythTokenIds",
+  TOKEN_PRICE: "tokenPrice",
 } as const;

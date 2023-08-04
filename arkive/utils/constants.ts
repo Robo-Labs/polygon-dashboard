@@ -1,2 +1,5 @@
 export const O_ETH = "0xee1727f5074e747716637e1776b7f7c7133f16b1";
 export const EXP_SCALE_DECIMALS = 18;
+export const PYTH_PRICE_DECIMALS = 8;
+export const ONE_HOUR_MS = 3600000;
+export const POLYGON_ZKEVM_BLOCKTIME_MS = 2000;

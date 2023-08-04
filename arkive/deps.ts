@@ -8,15 +8,19 @@ export {
   zeroAddress,
 } from "npm:viem";
 export { default as mongoose } from "npm:mongoose";
+export { composeMongoose } from "npm:graphql-compose-mongoose";
 export {
   type BlockHandler,
   createEntity,
   type EventHandlerFor,
+  GraphQLError,
   Manifest,
   Store,
   Types,
-} from "https://deno.land/x/robo_arkiver/mod.ts";
+} from "https://deno.land/x/robo_arkiver@v0.4.20/mod.ts";
 export {
   bigIntDivToFloat,
   bigIntToFloat,
-} from "https://deno.land/x/robo_arkiver/utils.ts";
+  getClosestTimestamp,
+  getTimestampFromBlockNumber,
+} from "https://deno.land/x/robo_arkiver@v0.4.20/utils.ts";
