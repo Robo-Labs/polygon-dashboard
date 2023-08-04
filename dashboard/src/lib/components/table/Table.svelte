@@ -12,13 +12,12 @@
 		type ColumnFiltersState,
 		type OnChangeFn
 	} from '@tanstack/svelte-table';
-	import { type Stat, fetchStats, STATS_QUERY_KEY } from '$lib/queries/stats';
+	import { type DailyAccountStat, fetchStats, STATS_QUERY_KEY } from '$lib/queries/stats';
 	import { createQuery } from '@tanstack/svelte-query';
 	import {
 		accountFilter,
 		debouncedProtocolFilter,
-		debouncedTokenFilter,
-		tokenFilter
+		debouncedTokenFilter
 	} from '$lib/stores/filters';
 	import { getProtocolBlockExplorer, getProtocolWebsite } from '$lib/utils/protocols';
 	import TableCellLink from './TableCellLink.svelte';
@@ -28,11 +27,11 @@
 	let columnFilters: ColumnFiltersState = [];
 
 	const query = createQuery({
-		queryKey: [`${STATS_QUERY_KEY}:${$accountFilter}`],
-		queryFn: () => fetchStats({ account: $accountFilter })
+		queryKey: [STATS_QUERY_KEY, $accountFilter],
+		queryFn: () => fetchStats(fetch, { account: $accountFilter })
 	});
 
-	const columnHelper = createColumnHelper<Stat>();
+	const columnHelper = createColumnHelper<DailyAccountStat>();
 
 	const defaultColumns = [
 		columnHelper.accessor('protocol', {
@@ -69,23 +68,23 @@
 					text: props.getValue()
 				})
 		}),
-		columnHelper.accessor('supply', {
+		columnHelper.accessor((row) => row.dailyStats[0].supply, {
+			id: 'supply',
+			cell: (props) =>
+				props
+					.getValue()
+					.toLocaleString('en', { notation: 'compact', style: 'currency', currency: 'USD' }),
 			header: 'Supply',
-			footer: 'Supply',
-			cell: (props) =>
-				props
-					.getValue()
-					.toLocaleString('en', { style: 'currency', currency: 'USD', notation: 'compact' }),
-			enableColumnFilter: false
+			footer: 'Supply'
 		}),
-		columnHelper.accessor('debt', {
-			header: 'Debt',
-			footer: 'Debt',
+		columnHelper.accessor((row) => row.dailyStats[0].debt, {
+			id: 'debt',
 			cell: (props) =>
 				props
 					.getValue()
-					.toLocaleString('en', { style: 'currency', currency: 'USD', notation: 'compact' }),
-			enableColumnFilter: false
+					.toLocaleString('en', { notation: 'compact', style: 'currency', currency: 'USD' }),
+			header: 'Debt',
+			footer: 'Debt'
 		})
 	];
 
@@ -119,7 +118,7 @@
 		}));
 	};
 
-	const options = writable<TableOptions<Stat>>({
+	const options = writable<TableOptions<DailyAccountStat>>({
 		data: $query.data?.stats ?? [],
 		columns: defaultColumns,
 		state: {

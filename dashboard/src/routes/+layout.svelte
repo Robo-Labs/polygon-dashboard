@@ -3,15 +3,9 @@
 	import '../app.css';
 	import LatestBlockHeight from '$lib/components/stats/LatestBlockHeight.svelte';
 	import Header from '$lib/components/header/Header.svelte';
-	import { browser } from '$app/environment';
+	import type { LayoutData } from './$types';
 
-	const queryClient = new QueryClient({
-		defaultOptions: {
-			queries: {
-				enabled: browser
-			}
-		}
-	});
+	export let data: LayoutData;
 </script>
 
 <svelte:head>
@@ -30,11 +24,11 @@
 		name="twitter:description"
 		content="Analytics for DeFi lending protocols by the Robo Labs team"
 	/>
-	<meta name="twitter:image" content="/robolabs_og.png" />
+	<meta name="twitter:image" content="https://dashboard.robolabs.biz/robolabs_og.png" />
 	<meta property="og:title" content="DeFi Lender Dashboard | Robo Labs" />
 	<meta property="og:type" content="website" />
-	<meta property="og:url" content="https://robolabs.biz" />
-	<meta property="og:image" content="/robolabs_og.png" />
+	<meta property="og:url" content="https://dashboard.robolabs.biz" />
+	<meta property="og:image" content="https://dashboard.robolabs.biz/robolabs_og.png" />
 	<meta
 		property="og:description"
 		content="Analytics for DeFi lending protocols by the Robo Labs team"
@@ -43,7 +37,7 @@
 	<meta property="og:locale" content="en_US" />
 </svelte:head>
 
-<QueryClientProvider client={queryClient}>
+<QueryClientProvider client={data.queryClient}>
 	<div class="w-full min-h-screen">
 		<Header />
 		<div class="container mx-auto flex flex-col items-center justify-center p-4 gap-4 prose-lg">

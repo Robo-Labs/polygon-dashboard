@@ -35,14 +35,11 @@ export default new Manifest("polygon-zkevm")
       schemaComposer,
     });
     const accTc = schemaComposer.getOTC("Account");
-    const marketTc = schemaComposer.getOTC("Market");
-    accTc.addRelation("market", {
-      type: marketTc.getType(),
-    });
+
     accLarTc.addRelation(
       "account",
       {
-        type: accTc.getType(),
+        type: accTc,
       },
     );
 

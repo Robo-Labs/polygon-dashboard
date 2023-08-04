@@ -8,8 +8,8 @@
 	export let hidden = false;
 
 	const query = createQuery({
-		queryKey: [`${STATS_QUERY_KEY}:${$accountFilter}`],
-		queryFn: () => fetchStats({ account: $accountFilter })
+		queryKey: [STATS_QUERY_KEY, $accountFilter],
+		queryFn: () => fetchStats(fetch, { account: $accountFilter })
 	});
 </script>
 

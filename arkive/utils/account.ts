@@ -64,7 +64,6 @@ export const getAccountDaily = async (params: {
     async () => {
       const existingAccountDaily = await AccountDaily.findOne({
         account: account._id,
-        market: account.market,
         timestamp: closestHour,
       });
 
@@ -72,20 +71,19 @@ export const getAccountDaily = async (params: {
 
       const previousAccountDaily = await AccountDaily.findOne({
         account: account._id,
-        market: account.market,
-        timestamp: { $lt: closestHour },
+        timestamp: { $lte: closestHour },
       }).sort({ timestamp: -1 });
 
       return new AccountDaily({
         account: account._id,
         market: account.market,
         timestamp: closestHour,
-        borrowBalance: previousAccountDaily?.borrowBalance || 0,
-        borrowIndex: previousAccountDaily?.borrowIndex || 0,
+        borrowBalance: previousAccountDaily?.borrowBalance ?? 0,
+        borrowIndex: previousAccountDaily?.borrowIndex ?? 0,
         oTokenCollateralBalance:
-          previousAccountDaily?.oTokenCollateralBalance || 0,
-        suppliedUsd: previousAccountDaily?.suppliedUsd || 0,
-        borrowedUsd: previousAccountDaily?.borrowedUsd || 0,
+          previousAccountDaily?.oTokenCollateralBalance ?? 0,
+        suppliedUsd: previousAccountDaily?.suppliedUsd ?? 0,
+        borrowedUsd: previousAccountDaily?.borrowedUsd ?? 0,
       });
     },
   );

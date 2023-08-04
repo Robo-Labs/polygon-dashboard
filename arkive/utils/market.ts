@@ -114,9 +114,9 @@ export const getMarketDaily = async (
 
       const newMarketDaily = new MarketDaily({
         market: market._id,
-        borrowIndex: previousMarketDaily?.borrowIndex || 1,
-        exchangeRate: previousMarketDaily?.exchangeRate || 0.02,
-        priceUsd: previousMarketDaily?.priceUsd || 1,
+        borrowIndex: previousMarketDaily?.borrowIndex ?? 1,
+        exchangeRate: previousMarketDaily?.exchangeRate ?? 0.02,
+        priceUsd: previousMarketDaily?.priceUsd ?? 1,
         timestamp: closestHour,
       });
 
