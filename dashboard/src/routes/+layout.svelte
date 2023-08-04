@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
-	import '../app.css';
 	import LatestBlockHeight from '$lib/components/stats/LatestBlockHeight.svelte';
 	import Header from '$lib/components/header/Header.svelte';
 	import type { LayoutData } from './$types';
+	import '@carbon/charts-svelte/styles.css';
+	import '../app.css';
 
 	export let data: LayoutData;
 </script>

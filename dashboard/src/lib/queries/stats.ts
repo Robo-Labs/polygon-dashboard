@@ -21,6 +21,8 @@ export type DailyAccountStat = Account & {
   }[];
 };
 
+export type DailyStat = DailyAccountStat["dailyStats"][number];
+
 export const STATS_QUERY_KEY = "stats" as const;
 
 export const fetchStats = async (

@@ -64,13 +64,14 @@ export const fetch0vixStats = async (
 > => {
   const accountIds = await fetchAccounts(fetchFn, filters);
   const now = Date.now();
-  const startTimestamp = (now - now % 86400000) - 86400000 * 7; // 7 days ago
+  // const startTimestamp = (now - now % 86400000) - 86400000 * 7; // 7 days ago
+  const startTimestamp = 1686182400000 - 86400000 * 7; // 7 days ago
 
   const res = await fetchFn(
     GRAPHQL_ENDPOINT,
     {
       body: JSON.stringify({
-        query: createStatsQuery(accountIds, 0, filters.account),
+        query: createStatsQuery(accountIds, startTimestamp, filters.account),
       }),
       headers: { "Content-Type": "application/json" },
       method: "POST",
