@@ -7,7 +7,7 @@ import {
 } from "../entities/account.ts";
 import { Market, MarketDaily } from "../entities/market.ts";
 
-const connection = mongoose.connections[0].useDb("0-0");
+const connection = mongoose.connections[0].useDb("138-2");
 
 const Account = connection.model("Account", _Account.schema);
 const AccountDaily = connection.model("AccountDaily", _AccountDaily.schema);

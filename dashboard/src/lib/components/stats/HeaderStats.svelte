@@ -17,11 +17,14 @@
 	});
 
 	$: totalSupply =
-		$query.data?.stats.reduce((acc, stat) => acc + stat.dailyStats[0].supply, 0) ?? 0;
+		$query.data?.stats.reduce((acc, stat) => acc + stat.dailyStats.slice(-1)[0].supply, 0) ?? 0;
 	$: totalBorrowed =
-		$query.data?.stats.reduce((acc, stat) => acc + stat.dailyStats[0].debt, 0) ?? 0;
+		$query.data?.stats.reduce((acc, stat) => acc + stat.dailyStats.slice(-1)[0].debt, 0) ?? 0;
 	$: totalBorrowingPower =
-		$query.data?.stats.reduce((acc, stat) => acc + stat.dailyStats[0].borrowingPower, 0) ?? 0;
+		$query.data?.stats.reduce(
+			(acc, stat) => acc + stat.dailyStats.slice(-1)[0].borrowingPower,
+			0
+		) ?? 0;
 	$: collateralAtRisk =
 		$query.data?.stats.reduce((acc, stat) => acc + stat.liquidationsAtRisk, 0) ?? 0;
 </script>

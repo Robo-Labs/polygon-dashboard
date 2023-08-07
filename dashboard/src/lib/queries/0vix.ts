@@ -4,17 +4,33 @@ import { array, number, object, parse, string } from "valibot";
 
 const PROTOCOL = "0VIX" as const;
 
-export const GRAPHQL_ENDPOINT = "http://localhost:4000/graphql" as const;
+export const GRAPHQL_ENDPOINT =
+  "https://data.staging.arkiver.net/robolabs/polygon-zkevm/graphql" as const;
 
 const createStatsQuery = (
-  accountIds: string[],
-  startTimestamp: number,
-  filterByAccountAddress?: string,
+  params: {
+    accountIds: string[];
+    startTimestamp: number;
+    endTimestamp: number;
+    filterByAccountAddress?: string;
+  },
 ) => {
+  const { accountIds, startTimestamp, endTimestamp, filterByAccountAddress } =
+    params;
   const accountFilter = accountIds.join(",");
   return /* GraphQL */ `{
 		AccountDailys(
-			filter: {_operators: {account: {in: [${accountFilter}]}, timestamp: {gte: ${startTimestamp}}}}
+			filter: {
+				_operators: {
+					account: {
+						in: [${accountFilter}]
+					},
+					timestamp: {
+						gte: ${startTimestamp},
+						lte: ${endTimestamp}
+					}
+				}
+			}
 		) {
 			timestamp
 			account {
@@ -64,14 +80,19 @@ export const fetch0vixStats = async (
 > => {
   const accountIds = await fetchAccounts(fetchFn, filters);
   const now = Date.now();
-  // const startTimestamp = (now - now % 86400000) - 86400000 * 7; // 7 days ago
-  const startTimestamp = 1686182400000 - 86400000 * 7; // 7 days ago
+  const startTimestamp = (now - now % 86400000) - 86400000 * 7; // 7 days ago
+  const endTimestamp = now - now % 86400000; // today
 
   const res = await fetchFn(
     GRAPHQL_ENDPOINT,
     {
       body: JSON.stringify({
-        query: createStatsQuery(accountIds, startTimestamp, filters.account),
+        query: createStatsQuery({
+          accountIds,
+          startTimestamp,
+          filterByAccountAddress: filters.account,
+          endTimestamp,
+        }),
       }),
       headers: { "Content-Type": "application/json" },
       method: "POST",
@@ -99,7 +120,7 @@ export const fetch0vixStats = async (
   );
 
   const statsObject = AccountDailys.sort((dailyA, dailyB) =>
-    dailyB.timestamp - dailyA.timestamp // sort by timestamp descending
+    dailyA.timestamp - dailyB.timestamp // sort by timestamp ascending
   ).reduce((acc, daily) => {
     const {
       account: {

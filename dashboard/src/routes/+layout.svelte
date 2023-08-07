@@ -1,10 +1,24 @@
 <script lang="ts">
-	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
+	import { QueryClientProvider } from '@tanstack/svelte-query';
 	import LatestBlockHeight from '$lib/components/stats/LatestBlockHeight.svelte';
 	import Header from '$lib/components/header/Header.svelte';
 	import type { LayoutData } from './$types';
-	import '@carbon/charts-svelte/styles.css';
 	import '../app.css';
+	import {
+		Chart as ChartJS,
+		Title,
+		Tooltip,
+		Legend,
+		LineElement,
+		LinearScale,
+		PointElement,
+		CategoryScale
+	} from 'chart.js';
+
+	ChartJS.register(Title, Tooltip, Legend, LineElement, LinearScale, PointElement, CategoryScale);
+
+	ChartJS.defaults.color = 'rgb(204, 206, 215)';
+	ChartJS.defaults.scale.grid.color = 'rgb(21, 39, 71)';
 
 	export let data: LayoutData;
 </script>
@@ -39,7 +53,7 @@
 </svelte:head>
 
 <QueryClientProvider client={data.queryClient}>
-	<div class="w-full min-h-screen">
+	<div class="w-full min-h-screen pb-4">
 		<Header />
 		<div class="container mx-auto flex flex-col items-center justify-center p-4 gap-4 prose-lg">
 			<h1 class="text-center m-0 mt-4 font-light font-header">DeFi Lender Dashboard</h1>

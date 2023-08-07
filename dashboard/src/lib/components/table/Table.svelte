@@ -68,7 +68,7 @@
 					text: props.getValue()
 				})
 		}),
-		columnHelper.accessor((row) => row.dailyStats[0].supply, {
+		columnHelper.accessor((row) => row.dailyStats.slice(-1)[0].supply, {
 			id: 'supply',
 			cell: (props) =>
 				props
@@ -77,7 +77,7 @@
 			header: 'Supply',
 			footer: 'Supply'
 		}),
-		columnHelper.accessor((row) => row.dailyStats[0].debt, {
+		columnHelper.accessor((row) => row.dailyStats.slice(-1)[0].debt, {
 			id: 'debt',
 			cell: (props) =>
 				props

@@ -25,24 +25,15 @@
 						.map((stat) => new Date(stat.timestamp).toLocaleDateString())
 				)
 			],
-			datasets: [
-				{
-					label: 'Supply',
-					data: $query.data.stats.flatMap((stat) => stat.dailyStats).map((stat) => stat.supply),
-					backgroundColor: getLineColor(0),
-					fill: false,
-					borderColor: getLineColor(0)
-				},
-				{
-					label: 'Debt',
-					data: $query.data.stats.flatMap((stat) => stat.dailyStats).map((stat) => stat.debt),
-					backgroundColor: getLineColor(1),
-					borderColor: getLineColor(1),
-					fill: false
-				}
-			]
+			datasets: $query.data.stats.map((stat, index) => ({
+				label: stat.pool,
+				data: stat.dailyStats.map((stat) => stat.debt),
+				backgroundColor: getLineColor(index),
+				fill: false,
+				borderColor: getLineColor(index)
+			}))
 		};
 	}
 </script>
 
-<LineChart {data} title="Total Supply & Debt" />
+<LineChart {data} title="Pools Debt" />
