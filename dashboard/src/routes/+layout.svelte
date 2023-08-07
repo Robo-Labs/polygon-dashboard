@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { QueryClientProvider } from '@tanstack/svelte-query';
+	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
 	import LatestBlockHeight from '$lib/components/stats/LatestBlockHeight.svelte';
 	import Header from '$lib/components/header/Header.svelte';
 	import type { LayoutData } from './$types';
@@ -14,13 +14,21 @@
 		PointElement,
 		CategoryScale
 	} from 'chart.js';
+	import { browser } from '$app/environment';
+	import { data } from 'tailwindcss/defaultTheme';
 
 	ChartJS.register(Title, Tooltip, Legend, LineElement, LinearScale, PointElement, CategoryScale);
 
 	ChartJS.defaults.color = 'rgb(204, 206, 215)';
 	ChartJS.defaults.scale.grid.color = 'rgb(21, 39, 71)';
 
-	export let data: LayoutData;
+	const queryClient = new QueryClient({
+		defaultOptions: {
+			queries: {
+				enabled: browser
+			}
+		}
+	});
 </script>
 
 <svelte:head>
@@ -52,7 +60,7 @@
 	<meta property="og:locale" content="en_US" />
 </svelte:head>
 
-<QueryClientProvider client={data.queryClient}>
+<QueryClientProvider client={queryClient}>
 	<div class="w-full min-h-screen pb-4">
 		<Header />
 		<div class="container mx-auto flex flex-col items-center justify-center p-4 gap-4 prose-lg">
