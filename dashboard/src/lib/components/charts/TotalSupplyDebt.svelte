@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { STATS_QUERY_KEY, fetchStats } from '$lib/queries/stats';
+	import { STATS_QUERY_KEY, fetchStats, type DailyStat } from '$lib/queries/stats';
 	import { accountFilter } from '$lib/stores/filters';
 	import { createQuery } from '@tanstack/svelte-query';
 	import LineChart from './LineChart.svelte';
@@ -28,14 +28,40 @@
 			datasets: [
 				{
 					label: 'Supply',
-					data: $query.data.stats.flatMap((stat) => stat.dailyStats).map((stat) => stat.supply),
+					data: Object.entries(
+						$query.data.stats.reduce((acc, stat) => {
+							stat.dailyStats.forEach((dailyStat) => {
+								if (acc[dailyStat.timestamp]) {
+									acc[dailyStat.timestamp] += dailyStat.supply;
+								} else {
+									acc[dailyStat.timestamp] = dailyStat.supply;
+								}
+							});
+							return acc;
+						}, {} as Record<number, number>)
+					)
+						.sort(([a], [b]) => Number(a) - Number(b))
+						.map(([_, supply]) => supply),
 					backgroundColor: getLineColor(0),
 					fill: false,
 					borderColor: getLineColor(0)
 				},
 				{
 					label: 'Debt',
-					data: $query.data.stats.flatMap((stat) => stat.dailyStats).map((stat) => stat.debt),
+					data: Object.entries(
+						$query.data.stats.reduce((acc, stat) => {
+							stat.dailyStats.forEach((dailyStat) => {
+								if (acc[dailyStat.timestamp]) {
+									acc[dailyStat.timestamp] += dailyStat.debt;
+								} else {
+									acc[dailyStat.timestamp] = dailyStat.debt;
+								}
+							});
+							return acc;
+						}, {} as Record<number, number>)
+					)
+						.sort(([a], [b]) => Number(a) - Number(b))
+						.map(([_, debt]) => debt),
 					backgroundColor: getLineColor(1),
 					borderColor: getLineColor(1),
 					fill: false

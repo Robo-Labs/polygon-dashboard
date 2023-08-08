@@ -2,6 +2,7 @@ import { createEntity, Types } from "../deps.ts";
 import { Market } from "./market.ts";
 
 export type Account = {
+  _id: Types.ObjectId;
   address: string;
   market: Market;
 };

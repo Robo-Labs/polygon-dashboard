@@ -85,7 +85,19 @@
 					.toLocaleString('en', { notation: 'compact', style: 'currency', currency: 'USD' }),
 			header: 'Debt',
 			footer: 'Debt'
-		})
+		}),
+		...($accountFilter && $accountFilter !== 'total'
+			? []
+			: [
+					columnHelper.accessor('liquidationsAtRisk', {
+						header: 'Liq. at Risk',
+						footer: 'Liq. at Risk',
+						cell: (props) =>
+							props
+								.getValue()
+								.toLocaleString('en', { notation: 'compact', style: 'currency', currency: 'USD' })
+					})
+			  ])
 	];
 
 	const setSorting: OnChangeFn<SortingState> = (updater) => {

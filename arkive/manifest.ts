@@ -1,5 +1,3 @@
-// deno-lint-ignore-file no-explicit-any
-import { composeMongoose } from "npm:graphql-compose-mongoose";
 import { COMPTROLLER } from "./abis/Comptroller.ts";
 import { OERC20 } from "./abis/OErc20.ts";
 import { PRICE_ORACLE } from "./abis/PriceOracle.ts";
@@ -21,7 +19,7 @@ import { onRedeem } from "./handlers/redeem.ts";
 import { onRepayBorrow } from "./handlers/repay-borrow.ts";
 import { onTokenIdSet } from "./handlers/token-id-set.ts";
 import { onTransfer } from "./handlers/transfer.ts";
-import { resolveLiquidationsAtRisk } from "./queries/liquidations.ts";
+import { updateLiquidationsAtRisk } from "./handlers/update-liquidations-at-risk.ts";
 
 export default new Manifest("polygon-zkevm")
   .addEntities([
@@ -29,34 +27,8 @@ export default new Manifest("polygon-zkevm")
     MarketDaily,
     Account,
     AccountDaily,
+    AccountLiquidationsAtRisk,
   ])
-  .extendSchema((schemaComposer) => {
-    const accLarTc = composeMongoose<any>(AccountLiquidationsAtRisk, {
-      schemaComposer,
-    });
-    const accTc = schemaComposer.getOTC("Account");
-
-    accLarTc.addRelation(
-      "account",
-      {
-        type: accTc,
-      },
-    );
-
-    schemaComposer.Query.addFields({
-      LiquidationsAtRisk: {
-        type: [accLarTc],
-        args: {
-          filterByAccountAddress: {
-            type: "String",
-          },
-        },
-        resolve: (_source: any, args: { filterByAccountAddress?: string }) => {
-          return resolveLiquidationsAtRisk(_source, args);
-        },
-      },
-    });
-  })
   .addChain("polygonZkEvm", (chain) =>
     chain
       .addContract({
@@ -105,5 +77,10 @@ export default new Manifest("polygon-zkevm")
         sources: {
           "0xC5E56d6b40F3e3B5fbfa266bCd35C37426537c65": 143n,
         },
+      })
+      .addBlockHandler({
+        blockInterval: 150, // 2s per block: 300 * 2 = 600s = 5min,
+        handler: updateLiquidationsAtRisk,
+        startBlockHeight: "live",
       }))
   .build();

@@ -12,11 +12,10 @@ const createStatsQuery = (
     accountIds: string[];
     startTimestamp: number;
     endTimestamp: number;
-    filterByAccountAddress?: string;
+    account?: string;
   },
 ) => {
-  const { accountIds, startTimestamp, endTimestamp, filterByAccountAddress } =
-    params;
+  const { accountIds, startTimestamp, endTimestamp, account } = params;
   const accountFilter = accountIds.join(",");
   return /* GraphQL */ `{
 		AccountDailys(
@@ -35,6 +34,7 @@ const createStatsQuery = (
 			timestamp
 			account {
 				market {
+					_id
 					address
 					underlyingAddress
 					symbol
@@ -49,14 +49,22 @@ const createStatsQuery = (
 		ArkiverMetadata(sort: PROCESSEDBLOCKHEIGHT_DESC) {
 			processedBlockHeight
 		}
-		LiquidationsAtRisk(filterByAccountAddress: "${
-    filterByAccountAddress ?? ""
-  }") {
-			liquidationsAtRisk
-			account {
-				_id
-			}
-		}
+		${
+    account ? "" : `AccountLiquidationsAtRisks {
+    	liquidationsAtRisk
+    	account {
+	      _id
+  	  }
+  	}`
+  }
+	${
+    account
+      ? `Markets(limit: 0) {
+    _id
+		collateralFactor
+  }`
+      : ""
+  }
 	}`;
 };
 
@@ -90,8 +98,8 @@ export const fetch0vixStats = async (
         query: createStatsQuery({
           accountIds,
           startTimestamp,
-          filterByAccountAddress: filters.account,
           endTimestamp,
+          account: filters.account,
         }),
       }),
       headers: { "Content-Type": "application/json" },
@@ -103,15 +111,18 @@ export const fetch0vixStats = async (
     throw new Error(`Failed to fetch stats for 0vix: ${res.statusText}`);
   }
 
-  const { AccountDailys, ArkiverMetadata, LiquidationsAtRisk } =
-    parse(raw0vixSchema, await res.json()).data;
+  const {
+    AccountDailys,
+    ArkiverMetadata,
+    AccountLiquidationsAtRisks,
+  } = parse(raw0vixSchema, await res.json()).data;
 
   const protocolBase = {
     protocol: PROTOCOL,
     protocolWebsite: getProtocolWebsite(PROTOCOL),
   };
 
-  const liquidationsAtRiskMap = LiquidationsAtRisk.reduce(
+  const liquidationsAtRiskMap = AccountLiquidationsAtRisks.reduce(
     (acc, { account: { _id }, liquidationsAtRisk }) => {
       acc[_id] = liquidationsAtRisk;
       return acc;
@@ -165,6 +176,13 @@ export const fetch0vixStats = async (
 
   const stats = Object.values(statsObject);
 
+  if (filters.account && stats.length) {
+    stats[0].liquidationsAtRisk = Object.values(liquidationsAtRiskMap).reduce(
+      (acc, lar) => acc + lar,
+      0,
+    );
+  }
+
   return {
     processedBlockHeight: ArkiverMetadata.processedBlockHeight,
     stats,
@@ -215,7 +233,7 @@ const raw0vixSchema = object({
     ArkiverMetadata: object({
       processedBlockHeight: number(),
     }),
-    LiquidationsAtRisk: array(object({
+    AccountLiquidationsAtRisks: array(object({
       liquidationsAtRisk: number(),
       account: object({
         _id: string(),

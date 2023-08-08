@@ -1,6 +1,7 @@
 import { createEntity, Types } from "../deps.ts";
 
 export type Market = {
+  _id: Types.ObjectId;
   name: string;
   address: string;
   symbol: string;
