@@ -8,10 +8,11 @@
 	$: loading = !data.datasets.length;
 </script>
 
-<div class="w-full px-10 py-8 outline outline-1 outline-secondary rounded">
+<div class="w-full px-10 py-8 outline outline-1 outline-secondary rounded h-[500px]">
 	{#if !loading}
 		<Line
 			{data}
+			style="height: 100%; width: 100%;"
 			options={{
 				responsive: true,
 				interaction: {
@@ -49,6 +50,8 @@
 			}}
 		/>
 	{:else}
-		<progress class="w-full progress" />
+		<div class="w-full h-full flex justify-center items-center">
+			<progress class="w-full progress" />
+		</div>
 	{/if}
 </div>

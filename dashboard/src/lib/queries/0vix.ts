@@ -12,10 +12,9 @@ const createStatsQuery = (
     accountIds: string[];
     startTimestamp: number;
     endTimestamp: number;
-    account?: string;
   },
 ) => {
-  const { accountIds, startTimestamp, endTimestamp, account } = params;
+  const { accountIds, startTimestamp, endTimestamp } = params;
   const accountFilter = accountIds.join(",");
   return /* GraphQL */ `{
 		AccountDailys(
@@ -29,17 +28,17 @@ const createStatsQuery = (
 						lte: ${endTimestamp}
 					}
 				}
-			}
+			},
+			limit: 0
 		) {
 			timestamp
 			account {
 				market {
-					_id
 					address
 					underlyingAddress
 					symbol
-					underlyingSymbol
 					collateralFactor
+					underlyingSymbol
 				}
 				_id
 			}
@@ -49,22 +48,12 @@ const createStatsQuery = (
 		ArkiverMetadata(sort: PROCESSEDBLOCKHEIGHT_DESC) {
 			processedBlockHeight
 		}
-		${
-    account ? "" : `AccountLiquidationsAtRisks {
+		AccountLiquidationsAtRisks {
     	liquidationsAtRisk
     	account {
 	      _id
   	  }
-  	}`
-  }
-	${
-    account
-      ? `Markets(limit: 0) {
-    _id
-		collateralFactor
-  }`
-      : ""
-  }
+		}
 	}`;
 };
 
@@ -88,7 +77,7 @@ export const fetch0vixStats = async (
 > => {
   const accountIds = await fetchAccounts(fetchFn, filters);
   const now = Date.now();
-  const startTimestamp = (now - now % 86400000) - 86400000 * 7; // 7 days ago
+  const startTimestamp = (now - now % 86400000) - 86400000 * 30; // 14 days ago
   const endTimestamp = now - now % 86400000; // today
 
   const res = await fetchFn(
@@ -99,7 +88,6 @@ export const fetch0vixStats = async (
           accountIds,
           startTimestamp,
           endTimestamp,
-          account: filters.account,
         }),
       }),
       headers: { "Content-Type": "application/json" },
@@ -175,6 +163,23 @@ export const fetch0vixStats = async (
   }, {} as Record<string, DailyAccountStat>);
 
   const stats = Object.values(statsObject);
+
+  const maxTimestamp = stats.reduce((acc, { dailyStats }) => {
+    const lastTimestamp = dailyStats[dailyStats.length - 1].timestamp;
+    return lastTimestamp > acc ? lastTimestamp : acc;
+  }, 0);
+
+  for (const stat of stats) {
+    const { dailyStats } = stat;
+    if (dailyStats[dailyStats.length - 1].timestamp !== maxTimestamp) {
+      dailyStats.push({
+        borrowingPower: dailyStats[dailyStats.length - 1].borrowingPower,
+        debt: dailyStats[dailyStats.length - 1].debt,
+        supply: dailyStats[dailyStats.length - 1].supply,
+        timestamp: maxTimestamp,
+      });
+    }
+  }
 
   if (filters.account && stats.length) {
     stats[0].liquidationsAtRisk = Object.values(liquidationsAtRiskMap).reduce(
