@@ -168,7 +168,7 @@
 </script>
 
 <div
-	class="overflow-x-auto w-full outline outline-1 outline-secondary text-secondary-content rounded shadow-lg"
+	class="w-full outline outline-1 outline-secondary text-secondary-content rounded shadow-lg max-h-[600px] overflow-auto"
 >
 	<table class="table table-lg">
 		<thead>
@@ -199,15 +199,25 @@
 			{/each}
 		</thead>
 		<tbody>
-			{#each $table.getRowModel().rows as row}
-				<tr class="hover:bg-base-200">
-					{#each row.getVisibleCells() as cell}
-						<td>
-							<svelte:component this={flexRender(cell.column.columnDef.cell, cell.getContext())} />
-						</td>
-					{/each}
+			{#if !$query.data || $query.isLoading}
+				<tr>
+					<td colspan="10" class="text-center">
+						<span class="loading loading-dots mt-4" />
+					</td>
 				</tr>
-			{/each}
+			{:else}
+				{#each $table.getRowModel().rows as row}
+					<tr class="hover:bg-base-200">
+						{#each row.getVisibleCells() as cell}
+							<td>
+								<svelte:component
+									this={flexRender(cell.column.columnDef.cell, cell.getContext())}
+								/>
+							</td>
+						{/each}
+					</tr>
+				{/each}
+			{/if}
 		</tbody>
 	</table>
 </div>

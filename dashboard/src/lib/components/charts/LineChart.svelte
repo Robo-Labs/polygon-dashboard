@@ -8,7 +8,7 @@
 	$: loading = !data.datasets.length;
 </script>
 
-<div class="w-full px-10 py-8 outline outline-1 outline-secondary rounded h-[500px]">
+<div class="w-full lg:px-10 lg:py-8 p-2 outline outline-1 outline-secondary rounded h-[500px]">
 	{#if !loading}
 		<Line
 			{data}
