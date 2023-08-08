@@ -1,6 +1,11 @@
 import { OERC20 } from "../abis/OErc20.ts";
-import { EventHandlerFor, zeroAddress } from "../deps.ts";
-import { updateAccountOTokenCollateral } from "../utils/account.ts";
+import {
+  EventHandlerFor,
+  getTimestampFromBlockNumber,
+  zeroAddress,
+} from "../deps.ts";
+import { updateAccountDailyOTokenCollateral } from "../utils/account.ts";
+import { ONE_HOUR_MS, POLYGON_ZKEVM_BLOCKTIME_MS } from "../utils/constants.ts";
 
 export const onTransfer: EventHandlerFor<typeof OERC20, "Transfer"> = async (
   ctx,
@@ -9,20 +14,32 @@ export const onTransfer: EventHandlerFor<typeof OERC20, "Transfer"> = async (
 
   if (transferShouldBeIgnored(ctx)) return;
 
+  const timestamp = await getTimestampFromBlockNumber({
+    blockNumber: ctx.event.blockNumber,
+    client: ctx.client,
+    store: ctx.store,
+    group: {
+      blockTimeMs: POLYGON_ZKEVM_BLOCKTIME_MS,
+      groupTimeMs: ONE_HOUR_MS,
+    },
+  });
+
   await Promise.all([
-    updateAccountOTokenCollateral({
+    updateAccountDailyOTokenCollateral({
       account: from,
       amount: -amount,
       client: ctx.client,
       store: ctx.store,
       oTokenAddress: ctx.event.address,
+      timestamp,
     }),
-    updateAccountOTokenCollateral({
+    updateAccountDailyOTokenCollateral({
       account: to,
       amount: amount,
       client: ctx.client,
       store: ctx.store,
       oTokenAddress: ctx.event.address,
+      timestamp,
     }),
   ]);
 };

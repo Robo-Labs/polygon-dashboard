@@ -2,16 +2,21 @@ import { OERC20 } from "../abis/OErc20.ts";
 import {
   bigIntDivToFloat,
   bigIntToFloat,
+  getClosestTimestamp,
   getContract,
   GetContractReturnType,
   mongoose,
   PublicClient,
   Store,
 } from "../deps.ts";
-import { Market } from "../entities/market.ts";
+import { Market, MarketDaily } from "../entities/market.ts";
 import { EXP_SCALE_DECIMALS, O_ETH } from "./constants.ts";
 import { STORE_KEYS } from "./keys.ts";
 import { getODecimals, getUnderlyingDecimals } from "./token.ts";
+
+/* -------------------------------------------------------------------------- */
+/*                                   GETTERS                                  */
+/* -------------------------------------------------------------------------- */
 
 export const getMarket = async (
   params: { address: `0x${string}`; store: Store; client: PublicClient },
@@ -62,14 +67,12 @@ export const getMarket = async (
 
       const newMarket = new Market({
         address,
-        borrowIndex: 1,
-        exchangeRate: 1,
         name,
         symbol,
-        priceUsd: 1,
         collateralFactor: 0,
         underlyingAddress,
         underlyingSymbol,
+        pythTokenId: "",
       });
       return newMarket.save();
     },
@@ -82,50 +85,131 @@ export const getMarkets = async () => {
   return await Market.find();
 };
 
-export const updateMarketBorrowindex = async (
+export const getMarketDaily = async (
+  params: {
+    address: `0x${string}`;
+    store: Store;
+    client: PublicClient;
+    timestamp: number;
+  },
+) => {
+  const market = await getMarket(params);
+
+  const closestHour = getClosestTimestamp(params.timestamp, 86400000);
+
+  const marketDaily = await params.store.retrieve(
+    `${STORE_KEYS.MARKET}:${market.address}:${closestHour}`,
+    async () => {
+      const existingMarketDaily = await MarketDaily.findOne({
+        market: market._id,
+        timestamp: closestHour,
+      });
+
+      if (existingMarketDaily) return existingMarketDaily;
+
+      const previousMarketDaily = await MarketDaily.findOne({
+        market: market._id,
+        timestamp: { $lt: closestHour },
+      }).sort({ timestamp: -1 });
+
+      const newMarketDaily = new MarketDaily({
+        market: market._id,
+        borrowIndex: previousMarketDaily?.borrowIndex ?? 1,
+        exchangeRate: previousMarketDaily?.exchangeRate ?? 0.02,
+        priceUsd: previousMarketDaily?.priceUsd ?? 1,
+        timestamp: closestHour,
+      });
+
+      return newMarketDaily;
+    },
+  );
+
+  return marketDaily;
+};
+
+export const getMarketPythTokenIds = async (params: {
+  store: Store;
+}) => {
+  const tokenIds = await params.store.retrieve(
+    STORE_KEYS.PYTH_TOKEN_IDS,
+    async () => {
+      const markets = await getMarkets();
+
+      return markets.reduce((acc, market) => {
+        acc[market.pythTokenId] = market.address; // [pythTokenId]: [marketAddress
+        return acc;
+      }, {} as Record<string, string>);
+    },
+  );
+
+  return tokenIds;
+};
+
+/* -------------------------------------------------------------------------- */
+/*                                   SETTERS                                  */
+/* -------------------------------------------------------------------------- */
+
+export const saveMarket = (params: {
+  store: Store;
+  address: `0x${string}`;
+  // deno-lint-ignore ban-types
+  market: mongoose.Document<unknown, {}, Market> & Market & {
+    _id: mongoose.Types.ObjectId;
+  };
+}) => {
+  const { store, address } = params;
+
+  store.set(
+    `${STORE_KEYS.MARKET}:${address.toLowerCase()}`,
+    params.market.save(),
+  );
+};
+
+export const saveMarketDaily = (params: {
+  store: Store;
+  address: `0x${string}`;
+  // deno-lint-ignore ban-types
+  marketDaily: mongoose.Document<unknown, {}, MarketDaily> & MarketDaily & {
+    _id: mongoose.Types.ObjectId;
+  };
+}) => {
+  const { store, address } = params;
+
+  store.set(
+    `${STORE_KEYS.MARKET}:${address.toLowerCase()}:${params.marketDaily.timestamp}`,
+    params.marketDaily.save(),
+  );
+};
+
+export const updateMarketDailyBorrowindex = async (
   params: {
     address: `0x${string}`;
     store: Store;
     client: PublicClient;
     borrowIndex: bigint;
+    timestamp: number;
   },
 ) => {
-  let { address, client, store, borrowIndex } = params;
+  let { address, client, store, borrowIndex, timestamp } = params;
 
   address = address.toLowerCase() as `0x${string}`;
 
-  const market = await getMarket({
+  const marketDaily = await getMarketDaily({
     address,
     client,
     store,
+    timestamp,
   });
 
   const formattedBorrowIndex = bigIntToFloat(borrowIndex, EXP_SCALE_DECIMALS);
 
-  market.borrowIndex = formattedBorrowIndex;
+  marketDaily.borrowIndex = formattedBorrowIndex;
 
-  saveMarket({
+  saveMarketDaily({
     address,
     store,
-    market,
+    marketDaily,
   });
-  store.set(`${STORE_KEYS.BORROW_INDEX}:${address}`, formattedBorrowIndex);
-};
-
-export const getMarketBorrowIndex = async (
-  params: { address: `0x${string}`; store: Store; client: PublicClient },
-) => {
-  let { address, store, client } = params;
-
-  address = address.toLowerCase() as `0x${string}`;
-
-  return await store.retrieve(
-    `${STORE_KEYS.BORROW_INDEX}:${address}`,
-    async () => {
-      const market = await getMarket({ address, client, store });
-      return market.borrowIndex;
-    },
-  );
 };
 
 export const updateMarketExchangeRate = async (params: {
@@ -135,9 +219,17 @@ export const updateMarketExchangeRate = async (params: {
   underlyingTokens: bigint;
   client: PublicClient;
   contract: GetContractReturnType<typeof OERC20, PublicClient>;
+  timestamp: number;
 }) => {
-  const { address, client, oTokens, store, underlyingTokens, contract } =
-    params;
+  const {
+    address,
+    client,
+    oTokens,
+    store,
+    underlyingTokens,
+    contract,
+    timestamp,
+  } = params;
 
   if (oTokens === 0n) return;
 
@@ -153,7 +245,7 @@ export const updateMarketExchangeRate = async (params: {
     }),
   ]);
 
-  const market = await getMarket({ address, client, store });
+  const market = await getMarketDaily({ address, client, store, timestamp });
 
   const exchangeRate = bigIntDivToFloat({
     amountA: underlyingTokens,
@@ -165,9 +257,9 @@ export const updateMarketExchangeRate = async (params: {
 
   market.exchangeRate = exchangeRate;
 
-  saveMarket({
+  saveMarketDaily({
     address,
-    market,
+    marketDaily: market,
     store,
   });
 };
@@ -202,20 +294,4 @@ export const updateMarketCollateralFactor = async (
     store,
     market,
   });
-};
-
-export const saveMarket = (params: {
-  store: Store;
-  address: `0x${string}`;
-  // deno-lint-ignore ban-types
-  market: mongoose.Document<unknown, {}, Market> & Market & {
-    _id: mongoose.Types.ObjectId;
-  };
-}) => {
-  const { store, address } = params;
-
-  store.set(
-    `${STORE_KEYS.MARKET}:${address.toLowerCase()}`,
-    params.market.save(),
-  );
 };

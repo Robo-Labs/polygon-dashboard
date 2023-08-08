@@ -1,25 +1,38 @@
-import { createEntity } from "../deps.ts";
+import { createEntity, Types } from "../deps.ts";
 
 export type Market = {
+  _id: Types.ObjectId;
+  name: string;
   address: string;
   symbol: string;
   underlyingAddress: string;
   underlyingSymbol: string;
-  name: string;
+  collateralFactor: number;
+  pythTokenId: string;
+};
+
+export type MarketDaily = {
+  market: Market;
   borrowIndex: number;
   exchangeRate: number;
   priceUsd: number;
-  collateralFactor: number;
+  timestamp: number;
 };
 
 export const Market = createEntity<Market>("Market", {
   address: { type: "string", index: true },
-  symbol: { type: "string", index: true },
+  name: "string",
+  symbol: "string",
   underlyingAddress: "string",
   underlyingSymbol: "string",
-  name: "string",
+  collateralFactor: "number",
+  pythTokenId: "string",
+});
+
+export const MarketDaily = createEntity<MarketDaily>("MarketDaily", {
+  market: { type: Types.ObjectId, ref: Market.modelName, index: true },
   borrowIndex: "number",
   exchangeRate: "number",
   priceUsd: "number",
-  collateralFactor: "number",
+  timestamp: { type: "number", index: true },
 });

@@ -6,8 +6,8 @@
 	import { accountFilter } from '$lib/stores/filters';
 
 	const query = createQuery({
-		queryKey: [`${STATS_QUERY_KEY}:${$accountFilter}`],
-		queryFn: () => fetchStats({ account: $accountFilter })
+		queryKey: [STATS_QUERY_KEY, $accountFilter],
+		queryFn: () => fetchStats(fetch, { account: $accountFilter })
 	});
 
 	const numberFormatter = new Intl.NumberFormat('en', {
@@ -16,10 +16,17 @@
 		notation: 'compact'
 	});
 
-	$: totalSupply = $query.data?.stats.reduce((acc, stat) => acc + stat.supply, 0) ?? 0;
-	$: totalBorrowed = $query.data?.stats.reduce((acc, stat) => acc + stat.debt, 0) ?? 0;
+	$: totalSupply =
+		$query.data?.stats.reduce((acc, stat) => acc + stat.dailyStats.slice(-1)[0].supply, 0) ?? 0;
+	$: totalBorrowed =
+		$query.data?.stats.reduce((acc, stat) => acc + stat.dailyStats.slice(-1)[0].debt, 0) ?? 0;
 	$: totalBorrowingPower =
-		$query.data?.stats.reduce((acc, stat) => acc + stat.supply * stat.collateralFactor, 0) ?? 0;
+		$query.data?.stats.reduce(
+			(acc, stat) => acc + stat.dailyStats.slice(-1)[0].borrowingPower,
+			0
+		) ?? 0;
+	$: collateralAtRisk =
+		$query.data?.stats.reduce((acc, stat) => acc + stat.liquidationsAtRisk, 0) ?? 0;
 </script>
 
 <StatsGroup>
@@ -29,7 +36,7 @@
 		loading={$query.data === undefined || $query.isLoading}
 	/>
 	<Stat
-		title="Borrowed / Borrowing Power"
+		title="Total Borrowed / Total Borrowing Power"
 		value={`${numberFormatter.format(totalBorrowed)} / ${numberFormatter.format(
 			totalBorrowingPower
 		)}`}
@@ -37,7 +44,8 @@
 	/>
 	<Stat
 		title="Liquidations at Risk"
-		value={numberFormatter.format($query.data?.collateralAtRisk ?? 0)}
+		value={numberFormatter.format(collateralAtRisk)}
 		loading={$query.data === undefined || $query.isLoading}
+		tooltip="The amount of collateral from borrowers with debt within 5% of their max borrow limit."
 	/>
 </StatsGroup>

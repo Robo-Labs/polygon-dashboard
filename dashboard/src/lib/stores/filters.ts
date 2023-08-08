@@ -1,16 +1,30 @@
-import { validateAddress } from "$lib/utils/validation";
-import { derived, writable } from "svelte/store";
+import { writable } from "svelte/store";
+import { createDebouncedDerivedStore } from "./debounced";
 
-export const poolFilter = writable("all");
-export const tokenFilter = writable("all");
-export const protocolFilter = writable("all");
-export const rawAccountFilter = writable("total");
-export const accountFilter = derived(rawAccountFilter, (account, set) => {
-  if (!account || account === "total") {
-    set("total");
-  }
+export const poolFilter = writable<string | undefined>();
+export const debouncedPoolFilter = createDebouncedDerivedStore(
+  poolFilter,
+  500,
+  undefined,
+);
 
-  if (validateAddress(account)) {
-    set(account);
-  }
-}, "total");
+export const tokenFilter = writable<string | undefined>();
+export const debouncedTokenFilter = createDebouncedDerivedStore(
+  tokenFilter,
+  500,
+  undefined,
+);
+
+export const protocolFilter = writable<string | undefined>();
+export const debouncedProtocolFilter = createDebouncedDerivedStore(
+  protocolFilter,
+  500,
+  undefined,
+);
+
+export const rawAccountFilter = writable<string | undefined>();
+export const accountFilter = createDebouncedDerivedStore(
+  rawAccountFilter,
+  500,
+  undefined,
+);

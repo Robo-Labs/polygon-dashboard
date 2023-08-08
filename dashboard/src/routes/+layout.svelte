@@ -1,11 +1,34 @@
 <script lang="ts">
-	import { QueryClientProvider } from '@tanstack/svelte-query';
-	import type { LayoutData } from './$types';
-	import '../app.css';
+	import { QueryClient, QueryClientProvider } from '@tanstack/svelte-query';
 	import LatestBlockHeight from '$lib/components/stats/LatestBlockHeight.svelte';
 	import Header from '$lib/components/header/Header.svelte';
+	import type { LayoutData } from './$types';
+	import '../app.css';
+	import {
+		Chart as ChartJS,
+		Title,
+		Tooltip,
+		Legend,
+		LineElement,
+		LinearScale,
+		PointElement,
+		CategoryScale
+	} from 'chart.js';
+	import { browser } from '$app/environment';
+	import { data } from 'tailwindcss/defaultTheme';
 
-	export let data: LayoutData;
+	ChartJS.register(Title, Tooltip, Legend, LineElement, LinearScale, PointElement, CategoryScale);
+
+	ChartJS.defaults.color = 'rgb(204, 206, 215)';
+	ChartJS.defaults.scale.grid.color = 'rgb(21, 39, 71)';
+
+	const queryClient = new QueryClient({
+		defaultOptions: {
+			queries: {
+				enabled: browser
+			}
+		}
+	});
 </script>
 
 <svelte:head>
@@ -24,11 +47,11 @@
 		name="twitter:description"
 		content="Analytics for DeFi lending protocols by the Robo Labs team"
 	/>
-	<meta name="twitter:image" content="robolabs_og.png" />
+	<meta name="twitter:image" content="https://dashboard.robolabs.biz/robolabs_og.png" />
 	<meta property="og:title" content="DeFi Lender Dashboard | Robo Labs" />
 	<meta property="og:type" content="website" />
-	<meta property="og:url" content="https://robolabs.biz" />
-	<meta property="og:image" content="robolabs_og.png" />
+	<meta property="og:url" content="https://dashboard.robolabs.biz" />
+	<meta property="og:image" content="https://dashboard.robolabs.biz/robolabs_og.png" />
 	<meta
 		property="og:description"
 		content="Analytics for DeFi lending protocols by the Robo Labs team"
@@ -37,14 +60,22 @@
 	<meta property="og:locale" content="en_US" />
 </svelte:head>
 
-<QueryClientProvider client={data.queryClient}>
-	<div class="w-full">
+<QueryClientProvider client={queryClient}>
+	<div class="w-full min-h-screen pb-4">
 		<Header />
 		<div class="container mx-auto flex flex-col items-center justify-center p-4 gap-4 prose-lg">
-			<h1 class="text-center m-0 font-light font-header">DeFi Lender Dashboard</h1>
+			<h1 class="text-center m-0 mt-4 font-light font-header">DeFi Lender Dashboard</h1>
 			<p class="w-full text-center m-0 font-light font-header">Polygon zkEVM</p>
 			<LatestBlockHeight />
 			<slot />
 		</div>
+		<p class="w-full text-center">
+			🤖 By the <a
+				href="https://robolabs.biz"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="link">Robo Labs</a
+			> team
+		</p>
 	</div>
 </QueryClientProvider>
