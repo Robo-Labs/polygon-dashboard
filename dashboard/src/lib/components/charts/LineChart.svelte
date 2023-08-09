@@ -27,7 +27,7 @@
 							text: yAxesLabel,
 							font: {
 								size: 16,
-								family: defaultTheme.fontFamily.sans.join(', ')
+								family: 'Inter, sans-serif'
 							}
 						}
 					}
@@ -42,9 +42,12 @@
 						display: true,
 						font: {
 							size: 20,
-							family: defaultTheme.fontFamily.sans.join(', '),
+							family: 'Inter, sans-serif',
 							weight: 'normal'
 						}
+					},
+					tooltip: {
+						itemSort: (a, b) => b.parsed.y - a.parsed.y
 					}
 				}
 			}}

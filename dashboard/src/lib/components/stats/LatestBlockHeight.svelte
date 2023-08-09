@@ -15,7 +15,7 @@
 
 {#if $query.data === undefined || $query.isLoading}
 	<div
-		class="fixed bottom-4 right-4 text-info px-3 rounded bg-base-200 bg-opacity-50 z-10 flex items-center"
+		class="fixed bottom-4 right-4 text-secondary-content px-3 rounded bg-base-200 bg-opacity-50 z-10 flex items-center"
 	>
 		<button
 			on:click={() => (hidden = !hidden)}
@@ -26,7 +26,7 @@
 	</div>
 {:else}
 	<div
-		class="fixed bottom-4 right-4 text-info px-3 rounded bg-base-200 bg-opacity-50 z-10 flex items-center"
+		class="fixed bottom-4 right-4 text-secondary-content px-3 rounded bg-base-200 bg-opacity-50 z-10 flex items-center"
 		class:gap-2={!hidden}
 	>
 		<button

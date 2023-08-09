@@ -61,7 +61,7 @@
 </svelte:head>
 
 <QueryClientProvider client={queryClient}>
-	<div class="w-full min-h-screen pb-4">
+	<div class="w-full min-h-screen pb-14">
 		<Header />
 		<div class="container mx-auto flex flex-col items-center justify-center p-4 gap-4 prose-lg">
 			<h1 class="text-center m-0 mt-4 font-light font-header">DeFi Lender Dashboard</h1>

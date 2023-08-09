@@ -7,7 +7,7 @@ export default {
 	theme: {
 		extend: {
 			fontFamily: {
-				'header': ['Roboto', ...defaultTheme.fontFamily.sans]
+				'header': ['Inter', ...defaultTheme.fontFamily.sans]
 			}
 		},
 	},
