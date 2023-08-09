@@ -16,7 +16,7 @@ export const updateLiquidationsAtRisk: BlockHandler = async (ctx) => {
   if (
     latestAccountLiquidationsAtRisk &&
     latestAccountLiquidationsAtRisk.lastUpdated >
-      Number(timestamp) - 10 * 60 * 1000 // 10 minutes
+      Number(timestamp) - 10 * 60 // 10 minutes
   ) {
     return;
   }
