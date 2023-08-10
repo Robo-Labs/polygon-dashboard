@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Line } from 'svelte-chartjs';
 	import type { Chart as ChartJS, ChartData, Point } from 'chart.js';
-	import * as numeral from 'numeral';
+	import numeral from 'numeral';
 	import defaultTheme from 'tailwindcss/defaultTheme';
 	export let data: ChartData<'line', (number | Point)[], unknown>;
 	export let title: string;
@@ -75,7 +75,6 @@
 						itemSort: (a, b) => a.parsed.y - b.parsed.y,
 						callbacks: {
 							label: function (context) {
-								console.log(context);
 								return `${context.dataset.label} ${numeral(context.parsed.y).format('$0.0a')}`;
 							}
 						}

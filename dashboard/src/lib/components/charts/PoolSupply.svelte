@@ -32,7 +32,7 @@
 				label: stat.pool,
 				data: stat.dailyStats.map((stat) => stat.supply),
 				backgroundColor: getLineColor(index),
-				fill: false,
+				fill: true,
 				borderColor: getLineColor(index)
 			}))
 		};

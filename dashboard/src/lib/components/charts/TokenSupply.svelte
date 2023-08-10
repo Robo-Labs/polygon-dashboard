@@ -50,7 +50,7 @@
 					.sort((a, b) => a.timestamp - b.timestamp)
 					.map((stat) => stat.supply),
 				backgroundColor: getLineColor(i),
-				fill: false,
+				fill: true,
 				borderColor: getLineColor(i)
 			});
 		});
