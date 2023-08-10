@@ -22,7 +22,7 @@
 				...new Set(
 					$query.data.stats
 						.flatMap((stat) => stat.dailyStats)
-						.map((stat) => new Date(stat.timestamp).toLocaleDateString())
+						.map((stat) => new Date(stat.timestamp).toLocaleDateString().slice(0, -5))
 				)
 			],
 			datasets: [
@@ -71,4 +71,4 @@
 	}
 </script>
 
-<LineChart {data} title="Total Supply & Debt" />
+<LineChart {data} title="Total Supply & Debt" stacked={false} />

@@ -17,15 +17,18 @@
 	};
 
 	$: if ($query.data?.stats) {
+		const sorted = $query.data.stats.sort(
+			(a, b) => Number(b.dailyStats[0].supply) - Number(a.dailyStats[0].supply)
+		);
 		data = {
 			labels: [
 				...new Set(
-					$query.data.stats
+					sorted
 						.flatMap((stat) => stat.dailyStats)
-						.map((stat) => new Date(stat.timestamp).toLocaleDateString())
+						.map((stat) => new Date(stat.timestamp).toLocaleDateString().slice(0, -5))
 				)
 			],
-			datasets: $query.data.stats.map((stat, index) => ({
+			datasets: sorted.map((stat, index) => ({
 				label: stat.pool,
 				data: stat.dailyStats.map((stat) => stat.supply),
 				backgroundColor: getLineColor(index),

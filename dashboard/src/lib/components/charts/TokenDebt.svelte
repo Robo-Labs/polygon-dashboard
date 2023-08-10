@@ -59,7 +59,7 @@
 			...new Set(
 				$query.data.stats
 					.flatMap((stat) => stat.dailyStats)
-					.map((stat) => new Date(stat.timestamp).toLocaleDateString())
+					.map((stat) => new Date(stat.timestamp).toLocaleDateString().slice(0, -5))
 			)
 		];
 	}
