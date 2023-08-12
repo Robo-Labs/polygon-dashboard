@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { Line } from 'svelte-chartjs';
 	import type { Chart as ChartJS, ChartData, Point } from 'chart.js';
+	import numeral from 'numeral';
 	import defaultTheme from 'tailwindcss/defaultTheme';
 	export let data: ChartData<'line', (number | Point)[], unknown>;
 	export let title: string;
+	export let stacked: boolean = true;
 	export let yAxesLabel: string = 'USD';
 	$: loading = !data.datasets.length;
 </script>
@@ -20,7 +22,14 @@
 					mode: 'index'
 				},
 				scales: {
+					x: {
+						grid: {
+							display: false
+						}
+					},
 					y: {
+						min: 0,
+						stacked,
 						display: true,
 						title: {
 							display: true,
@@ -29,7 +38,23 @@
 								size: 16,
 								family: 'Inter, sans-serif'
 							}
+						},
+						grid: {
+							display: false
+						},
+						ticks: {
+							callback: function (value, index, values) {
+								return numeral(value).format('$0a');
+							}
 						}
+					}
+				},
+				elements: {
+					point: {
+						radius: 0
+					},
+					line: {
+						tension: 0.2
 					}
 				},
 				plugins: {
@@ -47,7 +72,12 @@
 						}
 					},
 					tooltip: {
-						itemSort: (a, b) => b.parsed.y - a.parsed.y
+						itemSort: (a, b) => a.parsed.y - b.parsed.y,
+						callbacks: {
+							label: function (context) {
+								return `${context.dataset.label} ${numeral(context.parsed.y).format('$0.0a')}`;
+							}
+						}
 					}
 				}
 			}}

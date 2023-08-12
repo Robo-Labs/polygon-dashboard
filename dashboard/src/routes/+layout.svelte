@@ -12,12 +12,22 @@
 		LineElement,
 		LinearScale,
 		PointElement,
-		CategoryScale
+		CategoryScale,
+		Filler
 	} from 'chart.js';
 	import { browser } from '$app/environment';
 	import { data } from 'tailwindcss/defaultTheme';
 
-	ChartJS.register(Title, Tooltip, Legend, LineElement, LinearScale, PointElement, CategoryScale);
+	ChartJS.register(
+		Title,
+		Tooltip,
+		Legend,
+		LineElement,
+		LinearScale,
+		PointElement,
+		CategoryScale,
+		Filler
+	);
 
 	ChartJS.defaults.color = 'rgb(204, 206, 215)';
 	ChartJS.defaults.scale.grid.color = 'rgb(21, 39, 71)';

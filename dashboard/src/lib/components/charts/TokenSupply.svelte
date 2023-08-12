@@ -50,7 +50,7 @@
 					.sort((a, b) => a.timestamp - b.timestamp)
 					.map((stat) => stat.supply),
 				backgroundColor: getLineColor(i),
-				fill: false,
+				fill: true,
 				borderColor: getLineColor(i)
 			});
 		});
@@ -59,7 +59,7 @@
 			...new Set(
 				$query.data.stats
 					.flatMap((stat) => stat.dailyStats)
-					.map((stat) => new Date(stat.timestamp).toLocaleDateString())
+					.map((stat) => new Date(stat.timestamp).toLocaleDateString().slice(0, -5))
 			)
 		];
 	}
